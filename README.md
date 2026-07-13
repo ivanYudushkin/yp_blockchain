@@ -67,3 +67,80 @@ test tests::parse_token_created_reads_expected_fields ... ok
 
 test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
 ```
+
+## Шаг 3. Свой контур деплоя (localnet)
+
+Сгенерированы свои keypair программ, ID подставлены в `declare_id!`, `Anchor.toml`, тесты, frontend, backend и init-скрипты. Контракты собраны, задеплоены и инициализированы на localnet.
+
+### Адреса
+
+| Компонент | Адрес |
+|-----------|-------|
+| Oracle (`sol_usd_oracle`) | `8h4ZUSdg2uQ9sKFXHwFo9sLa2fgqdQUbuqLPktbS6SUB` |
+| Launchpad (`token_minter`) | `Gky53TnpYWU33mtsfd7tBFn3xggpuLtShGi1jQYn5x8P` |
+| PDA оракула (`oracle_state`) | `Fpwi1HzT8tz64HLeUPF252ZTGDpYcUZHHLk2euHMqrKW` |
+
+### Команды
+
+```bash
+cd program
+mkdir -p target/deploy
+solana-keygen new -o target/deploy/sol_usd_oracle-keypair.json --force --no-bip39-passphrase
+solana-keygen new -o target/deploy/token_minter-keypair.json --force --no-bip39-passphrase
+
+# подставить pubkey в declare_id!, Anchor.toml, frontend/app/config.ts, backend/.env.example, scripts/
+
+anchor build
+# в другом терминале: solana-test-validator
+anchor deploy --provider.cluster localnet
+node scripts/init-local.js
+```
+
+### Результат деплоя и init
+
+```
+Deploying program "sol_usd_oracle"...
+Program Id: 8h4ZUSdg2uQ9sKFXHwFo9sLa2fgqdQUbuqLPktbS6SUB
+Signature: 4GF8wKgNN4tFS7pfdZsbaXKREdNtdbyuG8GjiptouGDbGvcQWUjfES8yrPwyA4F3WtLmaNZNboRG9g1oum4YXmi9
+
+Deploying program "token_minter"...
+Program Id: Gky53TnpYWU33mtsfd7tBFn3xggpuLtShGi1jQYn5x8P
+Signature: kZZ7aWGhUp1Y1cVAWGyxb6ZPvqnqdFDeeBhWZmHrsJq5B7eR7udZ6hjSDwoA5dmzs1PSNf68ZFbkn1HZ3xT1Sgv
+Deploy success
+
+ORACLE_STATE_PUBKEY=Fpwi1HzT8tz64HLeUPF252ZTGDpYcUZHHLk2euHMqrKW
+Initializing oracle...
+  tx: x2nmZHUfnDsaf6XZuH4ad2R7XzyWv4ytqGzwUeqGzA5AW7TBmsrZzGV6UhQhu8chCkM8jhrTM7v3mx3MauZMgxp
+Setting initial price...
+  tx: 3kKa5MgBN71rMDNSsnEhaZVPT9imtr1JtK7Va6XPixK9dSFR5mQt9mw1gsRuWjmmtpR4dcEVCmY62qT9AVstMa6n
+Initializing minter (treasury = wallet)...
+  tx: 5fSkPjvHakC8frnLhdjh8gP8W9GkBqiQT8xtmBsvqgMEAjGa1cqicN3FKed36ATbK1Tw8Bc4vcZudjRK3vJ9Q2qA
+Done.
+```
+
+### Проверка тестов после смены ID
+
+```bash
+# из корня репозитория
+make test
+cd backend && cargo test
+```
+
+```
+  token_minter (LiteSVM)
+    ✔ initialize oracle + minter and mint token with fee
+    ✔ rejects mint when initial supply is zero
+    ✔ rejects mint when decimals exceed allowed range
+
+  sol_usd_oracle (LiteSVM)
+    ✔ initialize_oracle sets admin and defaults
+    ✔ update_price updates price only for admin
+    ✔ rejects update_price from non-admin signer
+    ✔ rejects zero price update
+
+  7 passing (50ms)
+```
+
+```
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+```
