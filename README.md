@@ -42,9 +42,9 @@ yarn run ts-mocha -p ./tsconfig.json -t 1000000 "tests/**/*.ts"
 
 Восстановлена helper-функция преобразования цены и исправлен сломанный unit-тест:
 
-- `**to_fixed_6**` — парсит decimal-строку в fixed-point с 6 знаками (`"120"` → `120_000_000`, `"120.12"` → `120_120_000`, `"0.000001"` → `1`); лишние цифры после 6-го знака **обрезаются**, не округляются
-- **тест `to_fixed_6_truncates_fraction_to_six_digits`** — ожидание `1_123_456` вместо `1_123_457` для `"1.1234569"`
-- `**Cargo.toml**` — путь к crate оракула: `../program/programs/sol_usd_oracle` (вместо `../program-task/...`)
+- `to_fixed_6` — парсит decimal-строку в fixed-point с 6 знаками (`"120"` → `120_000_000`, `"120.12"` → `120_120_000`, `"0.000001"` → `1`); лишние цифры после 6-го знака обрезаются, не округляются
+- тест `to_fixed_6_truncates_fraction_to_six_digits` — ожидание `1_123_456` вместо `1_123_457` для `"1.1234569"`
+- `Cargo.toml` — путь к crate оракула: `../program/programs/sol_usd_oracle` (вместо `../program-task/...`)
 
 Проверка:
 
@@ -240,7 +240,7 @@ Initializing minter...
   tx: 4VQj42Mk45FExG9hU9JWXHw2VbrXzz3FEoPoB3bat21wQbqoHhhLpuGrHjkjXWv1YGiWEeVptUg4s8WYFi3kj9Yf
 ```
 
-### Успешные минта в Devnet (Explorer)
+### Ссылки на успешные транзакции
 
 1. [https://explorer.solana.com/tx/2Vvni2LkonTdkpycvL3zjX1is3Hr6mkH84bbvkxw1vun1vhgfUiGeSEfQTs1yPdbnWqFTQt2ejqcA3M4JwKnUWp1?cluster=devnet](https://explorer.solana.com/tx/2Vvni2LkonTdkpycvL3zjX1is3Hr6mkH84bbvkxw1vun1vhgfUiGeSEfQTs1yPdbnWqFTQt2ejqcA3M4JwKnUWp1?cluster=devnet)
   mint: `9KHtGrw8zh7DQLdwnZooFCDKpwKhmN1EDKY3xx73gtYv`
